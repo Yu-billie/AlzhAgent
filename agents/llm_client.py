@@ -31,6 +31,7 @@ class LLMClient:
     def chat_direct(self, messages: list[dict], model_id: str,
                     temperature: float = 0.7, max_tokens: int = 4096) -> str:
         """model ID를 직접 지정하여 호출 (CONFIG 매핑 우회)"""
+        logger.info(f"chat_direct calling model: {model_id}")
         try:
             resp = self.client.chat.completions.create(
                 model=model_id, messages=messages,

@@ -111,9 +111,10 @@ async def rag_chat(req: RAGChatRequest):
     try:
         chat_bot = AlzhChat(req.api_key)
         # 프론트엔드 선택 모델의 실제 model ID 결정
-        model_id = CONFIG["free_chat_models"].get(req.model) if req.model else None
+        model_id = CONFIG["free_chat_models"].get(req.model, "")
         if not model_id:
-            model_id = CONFIG["free_chat_models"].get("nemotron-120b")  # 안전한 기본값
+            model_id = "nvidia/nemotron-3-super-120b-a12b:free"
+        logger.info(f"RAG chat model: req.model={req.model!r} -> model_id={model_id}")
         result = chat_bot.answer(req.question, req.history, model_id=model_id)
         return result
     except Exception as e:
