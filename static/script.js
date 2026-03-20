@@ -160,6 +160,7 @@ async function sendChat(e) {
                 api_key: apiKey,
                 question: text,
                 history: chatHistory.slice(-10),
+                model: modelSelect.value,
             }),
         });
 

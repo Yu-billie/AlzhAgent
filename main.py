@@ -103,13 +103,19 @@ class RAGChatRequest(BaseModel):
     api_key: str
     question: str
     history: list[dict] = []
+    model: str = ""
 
 
 @app.post("/api/rag-chat")
 async def rag_chat(req: RAGChatRequest):
     try:
         chat_bot = AlzhChat(req.api_key)
-        result = chat_bot.answer(req.question, req.history)
+        # 프론트엔드 선택 모델을 free_chat_models에서 찾아 config에 임시 등록
+        model_key = "chatbot"
+        if req.model and req.model in CONFIG["free_chat_models"]:
+            model_key = req.model
+            CONFIG["models"][req.model] = CONFIG["free_chat_models"][req.model]
+        result = chat_bot.answer(req.question, req.history, model_key=model_key)
         return result
     except Exception as e:
         logger.error(f"RAG chat error: {e}")
