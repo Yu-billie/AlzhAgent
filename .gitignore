@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.env
+.streamlit/
+med/
+chroma_db/
+*.egg-info/
+dist/
+build/
+alzhagent_venv/
+.claude/

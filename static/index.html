@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlzhAgent - 알츠하이머 신약 리서치</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧬</text></svg>">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>🧬 AlzhAgent</h2>
+            <p class="subtitle">알츠하이머 신약 리서치</p>
+        </div>
+        <div class="sidebar-content">
+            <label for="api-key">OpenRouter API Key</label>
+            <input type="password" id="api-key" placeholder="sk-or-...">
+
+            <label for="model-select">모델 선택</label>
+            <select id="model-select"></select>
+
+            <label for="temperature">Temperature: <span id="temp-value">0.3</span></label>
+            <input type="range" id="temperature" min="0" max="1" step="0.1" value="0.3">
+
+            <hr>
+
+            <!-- DB 상태 -->
+            <div class="db-stats">
+                <h4>📊 Knowledge DB</h4>
+                <div class="stat-row">
+                    <span>📚 Literature</span>
+                    <span id="lit-count" class="stat-num">-</span>
+                </div>
+                <div class="stat-row">
+                    <span>🔬 Research</span>
+                    <span id="res-count" class="stat-num">-</span>
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- 모드 전환 -->
+            <div class="mode-tabs">
+                <button class="mode-btn active" data-mode="chat" onclick="switchMode('chat')">💬 챗봇</button>
+                <button class="mode-btn" data-mode="research" onclick="switchMode('research')">🤖 리서치</button>
+                <button class="mode-btn" data-mode="explore" onclick="switchMode('explore')">📊 탐색</button>
+            </div>
+
+            <hr>
+            <div class="sidebar-info">
+                <a href="https://bio-research.ai/" target="_blank">Bio-Research.AI</a>
+                <a href="https://openrouter.ai/keys" target="_blank">OpenRouter 키 발급</a>
+            </div>
+            <button id="clear-btn" class="btn-clear" onclick="clearChat()">대화 초기화</button>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+        <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+
+        <!-- Chat Mode -->
+        <div id="mode-chat" class="mode-panel active">
+            <div class="chat-header">
+                <h1>💬 AlzhChat</h1>
+                <p>Research DB + Literature DB를 참조하는 RAG 챗봇</p>
+            </div>
+            <div class="chat-messages" id="chat-messages">
+                <div class="welcome-message">
+                    <div class="welcome-icon">🧬</div>
+                    <h3>AlzhChat에 오신 것을 환영합니다</h3>
+                    <p>에이전트 리서치 결과와 문헌 DB를 참조하여 답변합니다.</p>
+                    <div class="suggestion-chips">
+                        <button onclick="sendSuggestion('현재 DB에 어떤 알츠하이머 타깃 정보가 있나요?')">📋 DB 현황 보기</button>
+                        <button onclick="sendSuggestion('Tau 타깃 기반 알츠하이머 치료제 개발 동향은?')">🎯 Tau 타깃 동향</button>
+                        <button onclick="sendSuggestion('TREM2 작용제 최신 연구 요약해줘')">🧪 TREM2 연구</button>
+                    </div>
+                </div>
+            </div>
+            <form class="chat-input-form" id="chat-form" onsubmit="sendChat(event)">
+                <input type="text" id="chat-input" placeholder="질문을 입력하세요..." autocomplete="off">
+                <button type="submit" id="send-btn">전송</button>
+            </form>
+        </div>
+
+        <!-- Research Mode -->
+        <div id="mode-research" class="mode-panel">
+            <div class="chat-header">
+                <h1>🤖 자율 리서치 에이전트</h1>
+                <p>Supervisor → Literature → Design → Critic 자동 실행</p>
+            </div>
+            <div class="research-panel">
+                <div class="research-input">
+                    <label>리서치 주제</label>
+                    <input type="text" id="research-query" value="Tau aggregation inhibitors for Alzheimer's disease" placeholder="알츠하이머 신약 리서치 주제...">
+                    <div class="research-options">
+                        <label>생성 화합물 수: <input type="number" id="research-n" value="5" min="2" max="15"></label>
+                        <button id="research-start-btn" onclick="startResearch()" class="btn-primary">🚀 리서치 시작</button>
+                    </div>
+                </div>
+
+                <!-- Progress -->
+                <div id="research-progress" class="research-progress hidden">
+                    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+                    <p id="progress-msg">준비 중...</p>
+                </div>
+
+                <!-- Results -->
+                <div id="research-results" class="research-results hidden"></div>
+            </div>
+        </div>
+
+        <!-- Explore Mode -->
+        <div id="mode-explore" class="mode-panel">
+            <div class="chat-header">
+                <h1>📊 Knowledge DB 탐색</h1>
+                <p>축적된 리서치 결과와 문헌 데이터 검색</p>
+            </div>
+            <div class="explore-panel">
+                <div class="explore-search">
+                    <input type="text" id="explore-query" placeholder="검색어 입력 (예: Tau inhibitor, TREM2 agonist...)" onkeydown="if(event.key==='Enter')searchDB()">
+                    <select id="explore-target">
+                        <option value="all">전체</option>
+                        <option value="research">🔬 Research DB</option>
+                        <option value="literature">📚 Literature DB</option>
+                    </select>
+                    <button onclick="searchDB()" class="btn-primary">검색</button>
+                </div>
+                <div id="explore-results" class="explore-results"></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/script.js"></script>
+</body>
+</html>
