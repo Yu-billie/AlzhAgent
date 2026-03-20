@@ -28,6 +28,21 @@ class LLMClient:
             logger.error(f"LLM error: {e}")
             return f"[LLM Error: {e}]"
 
+    def chat_direct(self, messages: list[dict], model_id: str,
+                    temperature: float = 0.7, max_tokens: int = 4096) -> str:
+        """model ID를 직접 지정하여 호출 (CONFIG 매핑 우회)"""
+        try:
+            resp = self.client.chat.completions.create(
+                model=model_id, messages=messages,
+                temperature=temperature, max_tokens=max_tokens,
+            )
+            content = resp.choices[0].message.content or ""
+            content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()
+            return content
+        except Exception as e:
+            logger.error(f"LLM error: {e}")
+            return f"[LLM Error: {e}]"
+
     def chat_json(self, messages: list[dict], model_key: str = "supervisor",
                   temperature: float = 0.3) -> dict:
         if messages and messages[0]["role"] == "system":

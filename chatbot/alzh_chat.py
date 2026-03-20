@@ -26,7 +26,7 @@ class AlzhChat:
         self.vs = VectorStore.get()
         self.ner = BioNER()
 
-    def answer(self, question: str, history: list[dict] | None = None, model_key: str = "chatbot") -> dict:
+    def answer(self, question: str, history: list[dict] | None = None, model_id: str = "") -> dict:
         """듀얼 RAG 답변 생성"""
         ents = self.ner.extract(question)
         boost = " ".join(e.normalized for e in ents[:3])
@@ -55,7 +55,7 @@ Entities: {', '.join(e.normalized for e in ents) or 'None'}
 
 Answer with citations. Suggest follow-up questions."""})
 
-        answer = self.llm.chat(msgs, model_key=model_key, temperature=0.5)
+        answer = self.llm.chat_direct(msgs, model_id=model_id, temperature=0.5)
 
         sources = []
         for h in r_hits:

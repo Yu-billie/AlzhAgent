@@ -110,12 +110,11 @@ class RAGChatRequest(BaseModel):
 async def rag_chat(req: RAGChatRequest):
     try:
         chat_bot = AlzhChat(req.api_key)
-        # 프론트엔드 선택 모델을 free_chat_models에서 찾아 config에 임시 등록
-        model_key = "chatbot"
-        if req.model and req.model in CONFIG["free_chat_models"]:
-            model_key = req.model
-            CONFIG["models"][req.model] = CONFIG["free_chat_models"][req.model]
-        result = chat_bot.answer(req.question, req.history, model_key=model_key)
+        # 프론트엔드 선택 모델의 실제 model ID 결정
+        model_id = CONFIG["free_chat_models"].get(req.model) if req.model else None
+        if not model_id:
+            model_id = CONFIG["free_chat_models"].get("nemotron-120b")  # 안전한 기본값
+        result = chat_bot.answer(req.question, req.history, model_id=model_id)
         return result
     except Exception as e:
         logger.error(f"RAG chat error: {e}")
