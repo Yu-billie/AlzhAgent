@@ -13,11 +13,13 @@ CONFIG = {
     },
 
     "free_chat_models": {
-        "openrouter-auto": "openrouter/free",
         "nemotron-120b": "nvidia/nemotron-3-super-120b-a12b:free",
         "nemotron-30b": "nvidia/nemotron-3-nano-30b-a3b:free",
         "minimax-m2.5": "minimax/minimax-m2.5:free",
         "stepfun-flash": "stepfun/step-3.5-flash:free",
+        "arcee-trinity": "arcee-ai/trinity-large-preview:free",
+        "liquid-thinking": "liquid/lfm-2.5-1.2b-thinking:free",
+        "liquid-instruct": "liquid/lfm-2.5-1.2b-instruct:free",
     },
 
     "embedding_model": "all-MiniLM-L6-v2",
