@@ -1,0 +1,8 @@
+fastapi>=0.115.0
+uvicorn>=0.30.0
+openai>=1.0.0
+chromadb>=0.5.0
+sentence-transformers>=3.0.0
+biopython>=1.83
+pydantic>=2.0.0
+# rdkit-pypi>=2024.3.1  # Python 3.12 이하에서만 설치 가능. 없으면 자동 폴백.
