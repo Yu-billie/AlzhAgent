@@ -24,12 +24,16 @@ app = FastAPI(title="AlzhAgent")
 # ── 상태 관리 ──
 research_status = {"running": False, "step": 0, "total": 4, "message": "", "result": None}
 
-# ── 시작 시 DB 초기화 ──
+# ── 시작 시 DB 초기화 (백그라운드) ──
 @app.on_event("startup")
 def startup():
-    vs = VectorStore.get()
-    info = load_if_empty(vs)
-    logger.info(f"DB init: {info}")
+    def _init_db():
+        vs = VectorStore.get()
+        info = load_if_empty(vs)
+        logger.info(f"DB init: {info}")
+    t = threading.Thread(target=_init_db, daemon=True)
+    t.start()
+    logger.info("Server started — DB loading in background")
 
 
 # ══════════════════════════════════════════
