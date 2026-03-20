@@ -5,18 +5,19 @@ CONFIG = {
     "openrouter_base_url": "https://openrouter.ai/api/v1",
 
     "models": {
-        "supervisor": "deepseek/deepseek-r1:free",
-        "literature": "meta-llama/llama-3.1-8b-instruct:free",
-        "design": "qwen/qwen3-8b:free",
-        "critic": "deepseek/deepseek-r1:free",
-        "chatbot": "qwen/qwen3-8b:free",
+        "supervisor": "nvidia/nemotron-3-super-120b-a12b:free",
+        "literature": "nvidia/nemotron-3-nano-30b-a3b:free",
+        "design": "minimax/minimax-m2.5:free",
+        "critic": "nvidia/nemotron-3-super-120b-a12b:free",
+        "chatbot": "minimax/minimax-m2.5:free",
     },
 
     "free_chat_models": {
         "openrouter-auto": "openrouter/free",
-        "deepseek-r1": "deepseek/deepseek-r1:free",
-        "llama-3.1-8b": "meta-llama/llama-3.1-8b-instruct:free",
-        "qwen3-8b": "qwen/qwen3-8b:free",
+        "nemotron-120b": "nvidia/nemotron-3-super-120b-a12b:free",
+        "nemotron-30b": "nvidia/nemotron-3-nano-30b-a3b:free",
+        "minimax-m2.5": "minimax/minimax-m2.5:free",
+        "stepfun-flash": "stepfun/step-3.5-flash:free",
     },
 
     "embedding_model": "all-MiniLM-L6-v2",
